@@ -1,0 +1,82 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package files;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+
+/**
+ *
+ * @author BianA
+ */
+public class Files {
+    public static void enkripsi(File src, File dest)
+            throws IOException {
+
+        if (src.isDirectory()) {
+ 
+            //if directory not exists, create it
+            if (!dest.exists()) {
+                dest.mkdirs();
+                System.out.println("Directory copied from "
+                        + src + "  to " + dest);
+            }
+
+            //list all the directory contents
+            String files[] = src.list();
+
+            for (String file : files) {
+                //construct the src and dest file structure
+                File srcFile = new File(src, file);
+                File destFile = new File(dest, file);
+                //recursive copy
+                enkripsi(srcFile, destFile);
+            }
+
+        } else {
+            //if file, then copy it
+            //Use bytes stream to support all file types
+            InputStream in = new FileInputStream(src);
+            OutputStream out = new FileOutputStream(dest);
+
+            byte[] buffer = new byte[1024];
+            
+            int length;
+            int key = 69;
+            boolean done = false;
+            
+            while ((length = in.read()) > 0) {
+                if (length==1){
+                    done = true;
+                } else {
+                    byte b = (byte) length;
+                    byte c = (byte) (b+key);
+                    out.write(c);
+                }
+            }
+            //copy the file content in bytes 
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+
+            in.close();
+            out.close();
+            System.out.println("File copied from " + src + " to " + dest);
+        }
+    }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // TODO code application logic here
+    }
+    
+}
